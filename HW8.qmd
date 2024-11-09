@@ -1,0 +1,361 @@
+---
+title: "HW8"
+author: "Chris Hill"
+format: 
+  html:
+    toc: true
+    toc_depth: 3
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(tidymodels)
+
+set.seed(123)
+```
+
+
+## Read Data
+
+```{r}
+#| message: false
+
+data <- read_csv("SeoulBikeData.csv", locale=locale(encoding="latin1"))
+```
+
+## EDA
+
+### Missing Values
+
+```{r}
+anyNA(data)
+```
+
+### Check Columns
+
+```{r}
+glimpse(data)
+unique(data$Seasons)
+unique(data$Holiday)
+unique(data$`Functioning Day`)
+```
+
+### Convert Date Column
+
+```{r}
+data$Date <- dmy(data$Date)
+```
+
+### Categorical Columns to Factors
+
+```{r}
+data$Seasons <- as.factor(data$Seasons)
+data$Holiday <- as.factor(data$Holiday)
+data$`Functioning Day` <- as.factor(data$`Functioning Day`)
+```
+
+### Rename Columns
+
+```{r}
+data <- data |> rename(
+  rented_bike_count = `Rented Bike Count`,
+  temperature = `Temperature(°C)`,
+  humidity = `Humidity(%)`,
+  wind_speed = `Wind speed (m/s)`,
+  visibility = `Visibility (10m)`,
+  dew_point_temp = `Dew point temperature(°C)`,
+  solar_radiation = `Solar Radiation (MJ/m2)`,
+  rainfall = `Rainfall(mm)`,
+  snowfall = `Snowfall (cm)`,
+  functioning_day = `Functioning Day`,
+  date = Date,
+  hour = Hour,
+  season = Seasons,
+  holiday = Holiday
+)
+glimpse(data)
+```
+
+### Summary Statistics
+
+```{r}
+summary(data)
+
+summarize_bike_rentals <- function(data, group_vars) {
+  data |>
+    group_by(across(all_of(group_vars))) |>
+    summarize(
+      min_bike_count = min(rented_bike_count, na.rm = TRUE),
+      mean_bike_count = mean(rented_bike_count, na.rm = TRUE),
+      median_bike_count = median(rented_bike_count, na.rm = TRUE),
+      max_bike_count = max(rented_bike_count, na.rm = TRUE),
+      sd_bike_count = sd(rented_bike_count, na.rm = TRUE),
+      .groups = "drop" 
+    ) |>
+    knitr::kable()
+}
+```
+
+
+```{r}
+summarize_bike_rentals(data, "season")
+```
+
+
+```{r}
+summarize_bike_rentals(data, "holiday")
+```
+
+
+```{r}
+summarize_bike_rentals(data, "functioning_day")
+```
+
+### Subset on Functioning Days
+
+```{r}
+functioning_data <- data |> filter(functioning_day == "Yes")
+```
+
+###  Summarize Across the Hours
+
+```{r}
+daily_functioning_data <- functioning_data |>
+  group_by(date, season, holiday) |>
+  summarize(
+    total_bike_count = sum(rented_bike_count),
+    total_rainfall = sum(rainfall),
+    total_snowfall = sum(snowfall),
+    avg_temperature = mean(temperature),
+    avg_humidity = mean(humidity),
+    avg_wind_speed = mean(wind_speed),
+    avg_visibility = mean(visibility),
+    avg_dew_point_temp = mean(dew_point_temp),
+    avg_solar_radiation = mean(solar_radiation),
+    .groups = "drop"
+  )
+daily_functioning_data
+```
+
+### Recreate Basic Summary Stats and Correlations
+
+```{r}
+summary(daily_functioning_data$total_bike_count)
+
+numeric_vars <- daily_functioning_data |> select_if(is.numeric)
+
+cor_matrix <- cor(numeric_vars, use = "complete.obs")
+
+cor_matrix |> knitr::kable()
+
+```
+
+### Visual
+
+```{r}
+ggplot(daily_functioning_data, 
+       aes(x = avg_temperature, 
+           y = total_bike_count)
+       ) +
+  geom_point() +
+  labs(
+    title = "Daily Bike Rentals vs. Average Temperature",
+    x = "Average Temperature (Degrees C)",
+    y = "Total Bike Rentals"
+  )
+```
+
+## Split Data
+
+*Note: It was mentioned in the lecture that this might be done before our EDA, but here we are following the guidelines set in the assignment.*
+
+```{r}
+data_split <- initial_split(daily_functioning_data, 
+                            prop = 0.75, 
+                            strata = season)
+
+train_data <- training(data_split)
+test_data <- testing(data_split)
+
+cv_folds <- vfold_cv(train_data, v = 10)
+cv_folds
+```
+
+## Linear Models
+
+### Recipes (preprocessing)
+
+#### Recipe 1
+
+The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful to better understand what is happening.
+
+The matter at hand was simply errors involving column names. "dow" for instance was created as "date_dow". And the date_dow values were three letter abbreviations for the days.
+
+```{r}
+show_glimpse <- function(recipe) {
+  recipe |> 
+    prep(training = train_data) |> 
+    bake(new_data = NULL) |> 
+    glimpse()
+}
+
+debug_recipe <- recipe(total_bike_count ~ ., data = train_data) |>
+  update_role(date, new_role = "ID") |>
+  step_date(date, features = "dow")
+
+show_glimpse(debug_recipe)
+```
+
+```{r}
+debug_recipe <- debug_recipe |>
+  step_mutate(
+    day_type = factor(
+      if_else(date_dow %in% c("Sat", "Sun"), "weekend", "weekday")
+    )
+  )
+
+show_glimpse(debug_recipe)
+```
+
+```{r}
+debug_recipe <- debug_recipe |>
+  step_rm(date_dow)
+
+show_glimpse(debug_recipe)
+```
+
+```{r}
+debug_recipe <- debug_recipe |>
+  step_dummy(season, holiday, day_type) |>
+  step_normalize(all_numeric(), -all_outcomes())
+
+show_glimpse(debug_recipe)
+```
+
+**All together now:**
+
+```{r}
+recipe1 <- recipe(total_bike_count ~ ., data = train_data) |>
+  update_role(date, new_role = "ID") |>
+  step_date(date, features = "dow") |>
+  step_mutate(
+    day_type = factor(
+      if_else(date_dow %in% c("Sat", "Sun"), "weekend", "weekday")
+    )
+  ) |>
+  step_rm(date_dow) |>
+  step_dummy(season, holiday, day_type) |>
+  step_normalize(all_numeric(), -all_outcomes())
+
+recipe1
+```
+
+#### Recipe 2
+
+Unclear to the reason, but *starts_with("season")* did not work. Had to create the interactions manually in spite of the lecture notes in order to avoid the error.
+
+Also did a google search to address the following *warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")*. This lead to the addistion of the step_corr() function.
+
+```{r}
+recipe2 <- recipe1 |>
+  step_interact(terms = ~ season_Spring:holiday_No.Holiday + 
+                          season_Summer:holiday_No.Holiday +
+                          season_Winter:holiday_No.Holiday + 
+                          season_Spring:avg_temperature +
+                          season_Summer:avg_temperature + 
+                          season_Winter:avg_temperature +
+                          avg_temperature:total_rainfall)
+
+show_glimpse(recipe2)
+```
+
+#### Recipe 3
+
+```{r}
+recipe3 <- recipe2 |>
+  step_poly(avg_temperature, total_rainfall, total_snowfall, avg_humidity, 
+            avg_wind_speed, avg_visibility, avg_dew_point_temp, 
+            avg_solar_radiation, degree = 2)
+
+
+show_glimpse(recipe3)
+```
+
+### Set Up the Linear Model Engine
+
+```{r}
+lm_spec <- linear_reg() %>% set_engine("lm") 
+
+lm_spec
+```
+
+### Workflows
+
+```{r}
+workflow_and_results <- function(recipe) {
+  workflow <- workflow() |>
+    add_recipe(recipe) |>
+    add_model(lm_spec)
+    
+  results <- fit_resamples(
+    workflow,
+    resamples = cv_folds,
+    metrics = metric_set(rmse)
+  )
+  
+  results
+}
+
+results1 <- workflow_and_results(recipe1)
+results2 <- workflow_and_results(recipe2)
+results3 <- workflow_and_results(recipe3)
+```
+
+
+```{r}
+all_results <- bind_rows(
+  results1 |> collect_metrics() |> mutate(model = "Model 1"),
+  results2 |> collect_metrics() |> mutate(model = "Model 2"),
+  results3 |> collect_metrics() |> mutate(model = "Model 3")
+)
+
+ggplot(all_results, aes(x = model, y = mean, group = .metric, color = .metric)) +
+  geom_line() +
+  geom_point(size = 3) +
+  geom_point(data = slice_min(all_results, order_by = mean, n = 1), 
+             shape = 1, color = "black", size = 6, stroke = 1.5) +
+  labs(title = "Model Performance Comparison", x = "Model", y = "RMSE") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Fit Best Model
+
+```{r}
+final_workflow <- workflow() |>
+  add_recipe(recipe3) |>
+  add_model(lm_spec)
+
+final_fit <- last_fit(final_workflow, split = data_split)
+```
+
+```{r}
+test_metrics <- final_fit |> collect_metrics()
+test_metrics
+```
+
+```{r}
+final_coefficients <- final_fit |> 
+  extract_fit_parsnip() |> 
+  tidy()
+
+final_coefficients
+```
+

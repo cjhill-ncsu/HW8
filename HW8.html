@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Chris Hill">
+
+<title>HW8</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="HW8_files/libs/clipboard/clipboard.min.js"></script>
+<script src="HW8_files/libs/quarto-html/quarto.js"></script>
+<script src="HW8_files/libs/quarto-html/popper.min.js"></script>
+<script src="HW8_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="HW8_files/libs/quarto-html/anchor.min.js"></script>
+<link href="HW8_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="HW8_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="HW8_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="HW8_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="HW8_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#read-data" id="toc-read-data" class="nav-link active" data-scroll-target="#read-data">Read Data</a></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a>
+  <ul class="collapse">
+  <li><a href="#missing-values" id="toc-missing-values" class="nav-link" data-scroll-target="#missing-values">Missing Values</a></li>
+  <li><a href="#check-columns" id="toc-check-columns" class="nav-link" data-scroll-target="#check-columns">Check Columns</a></li>
+  <li><a href="#convert-date-column" id="toc-convert-date-column" class="nav-link" data-scroll-target="#convert-date-column">Convert Date Column</a></li>
+  <li><a href="#categorical-columns-to-factors" id="toc-categorical-columns-to-factors" class="nav-link" data-scroll-target="#categorical-columns-to-factors">Categorical Columns to Factors</a></li>
+  <li><a href="#rename-columns" id="toc-rename-columns" class="nav-link" data-scroll-target="#rename-columns">Rename Columns</a></li>
+  <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics">Summary Statistics</a></li>
+  <li><a href="#subset-on-functioning-days" id="toc-subset-on-functioning-days" class="nav-link" data-scroll-target="#subset-on-functioning-days">Subset on Functioning Days</a></li>
+  <li><a href="#summarize-across-the-hours" id="toc-summarize-across-the-hours" class="nav-link" data-scroll-target="#summarize-across-the-hours">Summarize Across the Hours</a></li>
+  <li><a href="#recreate-basic-summary-stats-and-correlations" id="toc-recreate-basic-summary-stats-and-correlations" class="nav-link" data-scroll-target="#recreate-basic-summary-stats-and-correlations">Recreate Basic Summary Stats and Correlations</a></li>
+  <li><a href="#visual" id="toc-visual" class="nav-link" data-scroll-target="#visual">Visual</a></li>
+  </ul></li>
+  <li><a href="#split-data" id="toc-split-data" class="nav-link" data-scroll-target="#split-data">Split Data</a></li>
+  <li><a href="#linear-models" id="toc-linear-models" class="nav-link" data-scroll-target="#linear-models">Linear Models</a>
+  <ul class="collapse">
+  <li><a href="#recipes-preprocessing" id="toc-recipes-preprocessing" class="nav-link" data-scroll-target="#recipes-preprocessing">Recipes (preprocessing)</a></li>
+  <li><a href="#set-up-the-linear-model-engine" id="toc-set-up-the-linear-model-engine" class="nav-link" data-scroll-target="#set-up-the-linear-model-engine">Set Up the Linear Model Engine</a></li>
+  <li><a href="#workflows" id="toc-workflows" class="nav-link" data-scroll-target="#workflows">Workflows</a></li>
+  </ul></li>
+  <li><a href="#fit-best-model" id="toc-fit-best-model" class="nav-link" data-scroll-target="#fit-best-model">Fit Best Model</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">HW8</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Chris Hill </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="read-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-data">Read Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"SeoulBikeData.csv"</span>, <span class="at">locale=</span><span class="fu">locale</span>(<span class="at">encoding=</span><span class="st">"latin1"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="eda" class="level2">
+<h2 class="anchored" data-anchor-id="eda">EDA</h2>
+<section id="missing-values" class="level3">
+<h3 class="anchored" data-anchor-id="missing-values">Missing Values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anyNA</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+</section>
+<section id="check-columns" class="level3">
+<h3 class="anchored" data-anchor-id="check-columns">Check Columns</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 8,760
+Columns: 14
+$ Date                        &lt;chr&gt; "01/12/2017", "01/12/2017", "01/12/2017", …
+$ `Rented Bike Count`         &lt;dbl&gt; 254, 204, 173, 107, 78, 100, 181, 460, 930…
+$ Hour                        &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, …
+$ `Temperature(°C)`           &lt;dbl&gt; -5.2, -5.5, -6.0, -6.2, -6.0, -6.4, -6.6, …
+$ `Humidity(%)`               &lt;dbl&gt; 37, 38, 39, 40, 36, 37, 35, 38, 37, 27, 24…
+$ `Wind speed (m/s)`          &lt;dbl&gt; 2.2, 0.8, 1.0, 0.9, 2.3, 1.5, 1.3, 0.9, 1.…
+$ `Visibility (10m)`          &lt;dbl&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, …
+$ `Dew point temperature(°C)` &lt;dbl&gt; -17.6, -17.6, -17.7, -17.6, -18.6, -18.7, …
+$ `Solar Radiation (MJ/m2)`   &lt;dbl&gt; 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, …
+$ `Rainfall(mm)`              &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ `Snowfall (cm)`             &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ Seasons                     &lt;chr&gt; "Winter", "Winter", "Winter", "Winter", "W…
+$ Holiday                     &lt;chr&gt; "No Holiday", "No Holiday", "No Holiday", …
+$ `Functioning Day`           &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", …</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(data<span class="sc">$</span>Seasons)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Winter" "Spring" "Summer" "Autumn"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(data<span class="sc">$</span>Holiday)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "No Holiday" "Holiday"   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(data<span class="sc">$</span><span class="st">`</span><span class="at">Functioning Day</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Yes" "No" </code></pre>
+</div>
+</div>
+</section>
+<section id="convert-date-column" class="level3">
+<h3 class="anchored" data-anchor-id="convert-date-column">Convert Date Column</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">dmy</span>(data<span class="sc">$</span>Date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="categorical-columns-to-factors" class="level3">
+<h3 class="anchored" data-anchor-id="categorical-columns-to-factors">Categorical Columns to Factors</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Seasons <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(data<span class="sc">$</span>Seasons)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Holiday <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(data<span class="sc">$</span>Holiday)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span><span class="st">`</span><span class="at">Functioning Day</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(data<span class="sc">$</span><span class="st">`</span><span class="at">Functioning Day</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rename-columns" class="level3">
+<h3 class="anchored" data-anchor-id="rename-columns">Rename Columns</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">rename</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">rented_bike_count =</span> <span class="st">`</span><span class="at">Rented Bike Count</span><span class="st">`</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">temperature =</span> <span class="st">`</span><span class="at">Temperature(°C)</span><span class="st">`</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">humidity =</span> <span class="st">`</span><span class="at">Humidity(%)</span><span class="st">`</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">wind_speed =</span> <span class="st">`</span><span class="at">Wind speed (m/s)</span><span class="st">`</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">visibility =</span> <span class="st">`</span><span class="at">Visibility (10m)</span><span class="st">`</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dew_point_temp =</span> <span class="st">`</span><span class="at">Dew point temperature(°C)</span><span class="st">`</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">solar_radiation =</span> <span class="st">`</span><span class="at">Solar Radiation (MJ/m2)</span><span class="st">`</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">rainfall =</span> <span class="st">`</span><span class="at">Rainfall(mm)</span><span class="st">`</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">snowfall =</span> <span class="st">`</span><span class="at">Snowfall (cm)</span><span class="st">`</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">functioning_day =</span> <span class="st">`</span><span class="at">Functioning Day</span><span class="st">`</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">date =</span> Date,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">hour =</span> Hour,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">season =</span> Seasons,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">holiday =</span> Holiday</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 8,760
+Columns: 14
+$ date              &lt;date&gt; 2017-12-01, 2017-12-01, 2017-12-01, 2017-12-01, 201…
+$ rented_bike_count &lt;dbl&gt; 254, 204, 173, 107, 78, 100, 181, 460, 930, 490, 339…
+$ hour              &lt;dbl&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15…
+$ temperature       &lt;dbl&gt; -5.2, -5.5, -6.0, -6.2, -6.0, -6.4, -6.6, -7.4, -7.6…
+$ humidity          &lt;dbl&gt; 37, 38, 39, 40, 36, 37, 35, 38, 37, 27, 24, 21, 23, …
+$ wind_speed        &lt;dbl&gt; 2.2, 0.8, 1.0, 0.9, 2.3, 1.5, 1.3, 0.9, 1.1, 0.5, 1.…
+$ visibility        &lt;dbl&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000…
+$ dew_point_temp    &lt;dbl&gt; -17.6, -17.6, -17.7, -17.6, -18.6, -18.7, -19.5, -19…
+$ solar_radiation   &lt;dbl&gt; 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.01…
+$ rainfall          &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ snowfall          &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ season            &lt;fct&gt; Winter, Winter, Winter, Winter, Winter, Winter, Wint…
+$ holiday           &lt;fct&gt; No Holiday, No Holiday, No Holiday, No Holiday, No H…
+$ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Ye…</code></pre>
+</div>
+</div>
+</section>
+<section id="summary-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      date            rented_bike_count      hour        temperature    
+ Min.   :2017-12-01   Min.   :   0.0    Min.   : 0.00   Min.   :-17.80  
+ 1st Qu.:2018-03-02   1st Qu.: 191.0    1st Qu.: 5.75   1st Qu.:  3.50  
+ Median :2018-06-01   Median : 504.5    Median :11.50   Median : 13.70  
+ Mean   :2018-06-01   Mean   : 704.6    Mean   :11.50   Mean   : 12.88  
+ 3rd Qu.:2018-08-31   3rd Qu.:1065.2    3rd Qu.:17.25   3rd Qu.: 22.50  
+ Max.   :2018-11-30   Max.   :3556.0    Max.   :23.00   Max.   : 39.40  
+    humidity       wind_speed      visibility   dew_point_temp   
+ Min.   : 0.00   Min.   :0.000   Min.   :  27   Min.   :-30.600  
+ 1st Qu.:42.00   1st Qu.:0.900   1st Qu.: 940   1st Qu.: -4.700  
+ Median :57.00   Median :1.500   Median :1698   Median :  5.100  
+ Mean   :58.23   Mean   :1.725   Mean   :1437   Mean   :  4.074  
+ 3rd Qu.:74.00   3rd Qu.:2.300   3rd Qu.:2000   3rd Qu.: 14.800  
+ Max.   :98.00   Max.   :7.400   Max.   :2000   Max.   : 27.200  
+ solar_radiation     rainfall          snowfall          season    
+ Min.   :0.0000   Min.   : 0.0000   Min.   :0.00000   Autumn:2184  
+ 1st Qu.:0.0000   1st Qu.: 0.0000   1st Qu.:0.00000   Spring:2208  
+ Median :0.0100   Median : 0.0000   Median :0.00000   Summer:2208  
+ Mean   :0.5691   Mean   : 0.1487   Mean   :0.07507   Winter:2160  
+ 3rd Qu.:0.9300   3rd Qu.: 0.0000   3rd Qu.:0.00000                
+ Max.   :3.5200   Max.   :35.0000   Max.   :8.80000                
+       holiday     functioning_day
+ Holiday   : 432   No : 295       
+ No Holiday:8328   Yes:8465       
+                                  
+                                  
+                                  
+                                  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>summarize_bike_rentals <span class="ot">&lt;-</span> <span class="cf">function</span>(data, group_vars) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(group_vars))) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">min_bike_count =</span> <span class="fu">min</span>(rented_bike_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_bike_count =</span> <span class="fu">mean</span>(rented_bike_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">median_bike_count =</span> <span class="fu">median</span>(rented_bike_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_bike_count =</span> <span class="fu">max</span>(rented_bike_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd_bike_count =</span> <span class="fu">sd</span>(rented_bike_count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_bike_rentals</span>(data, <span class="st">"season"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 17%">
+<col style="width: 18%">
+<col style="width: 21%">
+<col style="width: 17%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">season</th>
+<th style="text-align: right;">min_bike_count</th>
+<th style="text-align: right;">mean_bike_count</th>
+<th style="text-align: right;">median_bike_count</th>
+<th style="text-align: right;">max_bike_count</th>
+<th style="text-align: right;">sd_bike_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Autumn</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">819.5980</td>
+<td style="text-align: right;">763.5</td>
+<td style="text-align: right;">3298</td>
+<td style="text-align: right;">651.0856</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spring</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">730.0312</td>
+<td style="text-align: right;">583.0</td>
+<td style="text-align: right;">3251</td>
+<td style="text-align: right;">621.5096</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Summer</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1034.0734</td>
+<td style="text-align: right;">905.5</td>
+<td style="text-align: right;">3556</td>
+<td style="text-align: right;">690.2448</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Winter</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">225.5412</td>
+<td style="text-align: right;">203.0</td>
+<td style="text-align: right;">937</td>
+<td style="text-align: right;">150.3722</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_bike_rentals</span>(data, <span class="st">"holiday"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 16%">
+<col style="width: 17%">
+<col style="width: 20%">
+<col style="width: 16%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">holiday</th>
+<th style="text-align: right;">min_bike_count</th>
+<th style="text-align: right;">mean_bike_count</th>
+<th style="text-align: right;">median_bike_count</th>
+<th style="text-align: right;">max_bike_count</th>
+<th style="text-align: right;">sd_bike_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Holiday</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">499.7569</td>
+<td style="text-align: right;">240.0</td>
+<td style="text-align: right;">2400</td>
+<td style="text-align: right;">570.7728</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No Holiday</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">715.2280</td>
+<td style="text-align: right;">524.5</td>
+<td style="text-align: right;">3556</td>
+<td style="text-align: right;">646.8791</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_bike_rentals</span>(data, <span class="st">"functioning_day"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 17%">
+<col style="width: 19%">
+<col style="width: 15%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">functioning_day</th>
+<th style="text-align: right;">min_bike_count</th>
+<th style="text-align: right;">mean_bike_count</th>
+<th style="text-align: right;">median_bike_count</th>
+<th style="text-align: right;">max_bike_count</th>
+<th style="text-align: right;">sd_bike_count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">729.157</td>
+<td style="text-align: right;">542</td>
+<td style="text-align: right;">3556</td>
+<td style="text-align: right;">642.3512</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="subset-on-functioning-days" class="level3">
+<h3 class="anchored" data-anchor-id="subset-on-functioning-days">Subset on Functioning Days</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>functioning_data <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">filter</span>(functioning_day <span class="sc">==</span> <span class="st">"Yes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="summarize-across-the-hours" class="level3">
+<h3 class="anchored" data-anchor-id="summarize-across-the-hours">Summarize Across the Hours</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>daily_functioning_data <span class="ot">&lt;-</span> functioning_data <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date, season, holiday) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_bike_count =</span> <span class="fu">sum</span>(rented_bike_count),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_rainfall =</span> <span class="fu">sum</span>(rainfall),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_snowfall =</span> <span class="fu">sum</span>(snowfall),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_temperature =</span> <span class="fu">mean</span>(temperature),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_humidity =</span> <span class="fu">mean</span>(humidity),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_wind_speed =</span> <span class="fu">mean</span>(wind_speed),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_visibility =</span> <span class="fu">mean</span>(visibility),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_dew_point_temp =</span> <span class="fu">mean</span>(dew_point_temp),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_solar_radiation =</span> <span class="fu">mean</span>(solar_radiation),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>daily_functioning_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 353 × 12
+   date       season holiday    total_bike_count total_rainfall total_snowfall
+   &lt;date&gt;     &lt;fct&gt;  &lt;fct&gt;                 &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+ 1 2017-12-01 Winter No Holiday             9539            0              0  
+ 2 2017-12-02 Winter No Holiday             8523            0              0  
+ 3 2017-12-03 Winter No Holiday             7222            4              0  
+ 4 2017-12-04 Winter No Holiday             8729            0.1            0  
+ 5 2017-12-05 Winter No Holiday             8307            0              0  
+ 6 2017-12-06 Winter No Holiday             6669            1.3            8.6
+ 7 2017-12-07 Winter No Holiday             8549            0             10.4
+ 8 2017-12-08 Winter No Holiday             8032            0              0  
+ 9 2017-12-09 Winter No Holiday             7233            0              0  
+10 2017-12-10 Winter No Holiday             3453            4.1           32.5
+# ℹ 343 more rows
+# ℹ 6 more variables: avg_temperature &lt;dbl&gt;, avg_humidity &lt;dbl&gt;,
+#   avg_wind_speed &lt;dbl&gt;, avg_visibility &lt;dbl&gt;, avg_dew_point_temp &lt;dbl&gt;,
+#   avg_solar_radiation &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="recreate-basic-summary-stats-and-correlations" class="level3">
+<h3 class="anchored" data-anchor-id="recreate-basic-summary-stats-and-correlations">Recreate Basic Summary Stats and Correlations</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(daily_functioning_data<span class="sc">$</span>total_bike_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    977    6967   18563   17485   26285   36149 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>numeric_vars <span class="ot">&lt;-</span> daily_functioning_data <span class="sc">|&gt;</span> <span class="fu">select_if</span>(is.numeric)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(numeric_vars, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">total_bike_count</th>
+<th style="text-align: right;">total_rainfall</th>
+<th style="text-align: right;">total_snowfall</th>
+<th style="text-align: right;">avg_temperature</th>
+<th style="text-align: right;">avg_humidity</th>
+<th style="text-align: right;">avg_wind_speed</th>
+<th style="text-align: right;">avg_visibility</th>
+<th style="text-align: right;">avg_dew_point_temp</th>
+<th style="text-align: right;">avg_solar_radiation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">total_bike_count</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">-0.2391091</td>
+<td style="text-align: right;">-0.2652911</td>
+<td style="text-align: right;">0.7530767</td>
+<td style="text-align: right;">0.0358870</td>
+<td style="text-align: right;">-0.1928814</td>
+<td style="text-align: right;">0.1659937</td>
+<td style="text-align: right;">0.6504765</td>
+<td style="text-align: right;">0.7358929</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">total_rainfall</td>
+<td style="text-align: right;">-0.2391091</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">-0.0231340</td>
+<td style="text-align: right;">0.1445173</td>
+<td style="text-align: right;">0.5286426</td>
+<td style="text-align: right;">-0.1016758</td>
+<td style="text-align: right;">-0.2219939</td>
+<td style="text-align: right;">0.2645662</td>
+<td style="text-align: right;">-0.3227041</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">total_snowfall</td>
+<td style="text-align: right;">-0.2652911</td>
+<td style="text-align: right;">-0.0231340</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">-0.2669637</td>
+<td style="text-align: right;">0.0653919</td>
+<td style="text-align: right;">0.0208816</td>
+<td style="text-align: right;">-0.1018890</td>
+<td style="text-align: right;">-0.2095529</td>
+<td style="text-align: right;">-0.2334306</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">avg_temperature</td>
+<td style="text-align: right;">0.7530767</td>
+<td style="text-align: right;">0.1445173</td>
+<td style="text-align: right;">-0.2669637</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.4041675</td>
+<td style="text-align: right;">-0.2607218</td>
+<td style="text-align: right;">0.0023367</td>
+<td style="text-align: right;">0.9627963</td>
+<td style="text-align: right;">0.5502743</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">avg_humidity</td>
+<td style="text-align: right;">0.0358870</td>
+<td style="text-align: right;">0.5286426</td>
+<td style="text-align: right;">0.0653919</td>
+<td style="text-align: right;">0.4041675</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">-0.2342578</td>
+<td style="text-align: right;">-0.5591773</td>
+<td style="text-align: right;">0.6320473</td>
+<td style="text-align: right;">-0.2744497</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">avg_wind_speed</td>
+<td style="text-align: right;">-0.1928814</td>
+<td style="text-align: right;">-0.1016758</td>
+<td style="text-align: right;">0.0208816</td>
+<td style="text-align: right;">-0.2607218</td>
+<td style="text-align: right;">-0.2342578</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.2060226</td>
+<td style="text-align: right;">-0.2877032</td>
+<td style="text-align: right;">0.0961263</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">avg_visibility</td>
+<td style="text-align: right;">0.1659937</td>
+<td style="text-align: right;">-0.2219939</td>
+<td style="text-align: right;">-0.1018890</td>
+<td style="text-align: right;">0.0023367</td>
+<td style="text-align: right;">-0.5591773</td>
+<td style="text-align: right;">0.2060226</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">-0.1535516</td>
+<td style="text-align: right;">0.2713959</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">avg_dew_point_temp</td>
+<td style="text-align: right;">0.6504765</td>
+<td style="text-align: right;">0.2645662</td>
+<td style="text-align: right;">-0.2095529</td>
+<td style="text-align: right;">0.9627963</td>
+<td style="text-align: right;">0.6320473</td>
+<td style="text-align: right;">-0.2877032</td>
+<td style="text-align: right;">-0.1535516</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.3831571</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">avg_solar_radiation</td>
+<td style="text-align: right;">0.7358929</td>
+<td style="text-align: right;">-0.3227041</td>
+<td style="text-align: right;">-0.2334306</td>
+<td style="text-align: right;">0.5502743</td>
+<td style="text-align: right;">-0.2744497</td>
+<td style="text-align: right;">0.0961263</td>
+<td style="text-align: right;">0.2713959</td>
+<td style="text-align: right;">0.3831571</td>
+<td style="text-align: right;">1.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="visual" class="level3">
+<h3 class="anchored" data-anchor-id="visual">Visual</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(daily_functioning_data, </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> avg_temperature, </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> total_bike_count)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Daily Bike Rentals vs. Average Temperature"</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Average Temperature (Degrees C)"</span>,</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Total Bike Rentals"</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW8_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="split-data" class="level2">
+<h2 class="anchored" data-anchor-id="split-data">Split Data</h2>
+<p><em>Note: It was mentioned in the lecture that this might be done before our EDA, but here we are following the guidelines set in the assignment.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>data_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(daily_functioning_data, </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">prop =</span> <span class="fl">0.75</span>, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">strata =</span> season)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> <span class="fu">training</span>(data_split)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">testing</span>(data_split)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>cv_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train_data, <span class="at">v =</span> <span class="dv">10</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>cv_folds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  10-fold cross-validation 
+# A tibble: 10 × 2
+   splits           id    
+   &lt;list&gt;           &lt;chr&gt; 
+ 1 &lt;split [236/27]&gt; Fold01
+ 2 &lt;split [236/27]&gt; Fold02
+ 3 &lt;split [236/27]&gt; Fold03
+ 4 &lt;split [237/26]&gt; Fold04
+ 5 &lt;split [237/26]&gt; Fold05
+ 6 &lt;split [237/26]&gt; Fold06
+ 7 &lt;split [237/26]&gt; Fold07
+ 8 &lt;split [237/26]&gt; Fold08
+ 9 &lt;split [237/26]&gt; Fold09
+10 &lt;split [237/26]&gt; Fold10</code></pre>
+</div>
+</div>
+</section>
+<section id="linear-models" class="level2">
+<h2 class="anchored" data-anchor-id="linear-models">Linear Models</h2>
+<section id="recipes-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="recipes-preprocessing">Recipes (preprocessing)</h3>
+<section id="recipe-1" class="level4">
+<h4 class="anchored" data-anchor-id="recipe-1">Recipe 1</h4>
+<p>The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful to better understand what is happening.</p>
+<p>The matter at hand was simply errors involving column names. “dow” for instance was created as “date_dow”. And the date_dow values were three letter abbreviations for the days.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>show_glimpse <span class="ot">&lt;-</span> <span class="cf">function</span>(recipe) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  recipe <span class="sc">|&gt;</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prep</span>(<span class="at">training =</span> train_data) <span class="sc">|&gt;</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glimpse</span>()</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>debug_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(total_bike_count <span class="sc">~</span> ., <span class="at">data =</span> train_data) <span class="sc">|&gt;</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(date, <span class="at">new_role =</span> <span class="st">"ID"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_date</span>(date, <span class="at">features =</span> <span class="st">"dow"</span>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(debug_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 13
+$ date                &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07, 2018-09-08, 2…
+$ season              &lt;fct&gt; Autumn, Autumn, Autumn, Autumn, Autumn, Autumn, Au…
+$ holiday             &lt;fct&gt; No Holiday, No Holiday, No Holiday, No Holiday, No…
+$ total_rainfall      &lt;dbl&gt; 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.2, …
+$ total_snowfall      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ avg_temperature     &lt;dbl&gt; 23.837500, 24.250000, 22.158333, 21.691667, 21.958…
+$ avg_humidity        &lt;dbl&gt; 61.79167, 70.79167, 56.87500, 48.66667, 49.45833, …
+$ avg_wind_speed      &lt;dbl&gt; 2.5041667, 1.8958333, 2.4791667, 1.6666667, 1.2333…
+$ avg_visibility      &lt;dbl&gt; 1954.1667, 1635.2500, 1848.7083, 1982.1250, 1997.1…
+$ avg_dew_point_temp  &lt;dbl&gt; 15.4416667, 18.2625000, 12.6458333, 9.8041667, 10.…
+$ avg_solar_radiation &lt;dbl&gt; 0.9358333, 0.4595833, 0.8158333, 0.9479167, 0.8916…
+$ total_bike_count    &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, 30781, 31809, 3…
+$ date_dow            &lt;fct&gt; Wed, Thu, Fri, Sat, Sun, Mon, Wed, Thu, Fri, Sat, …</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>debug_recipe <span class="ot">&lt;-</span> debug_recipe <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">day_type =</span> <span class="fu">factor</span>(</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(date_dow <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Sat"</span>, <span class="st">"Sun"</span>), <span class="st">"weekend"</span>, <span class="st">"weekday"</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(debug_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 14
+$ date                &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07, 2018-09-08, 2…
+$ season              &lt;fct&gt; Autumn, Autumn, Autumn, Autumn, Autumn, Autumn, Au…
+$ holiday             &lt;fct&gt; No Holiday, No Holiday, No Holiday, No Holiday, No…
+$ total_rainfall      &lt;dbl&gt; 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.2, …
+$ total_snowfall      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ avg_temperature     &lt;dbl&gt; 23.837500, 24.250000, 22.158333, 21.691667, 21.958…
+$ avg_humidity        &lt;dbl&gt; 61.79167, 70.79167, 56.87500, 48.66667, 49.45833, …
+$ avg_wind_speed      &lt;dbl&gt; 2.5041667, 1.8958333, 2.4791667, 1.6666667, 1.2333…
+$ avg_visibility      &lt;dbl&gt; 1954.1667, 1635.2500, 1848.7083, 1982.1250, 1997.1…
+$ avg_dew_point_temp  &lt;dbl&gt; 15.4416667, 18.2625000, 12.6458333, 9.8041667, 10.…
+$ avg_solar_radiation &lt;dbl&gt; 0.9358333, 0.4595833, 0.8158333, 0.9479167, 0.8916…
+$ total_bike_count    &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, 30781, 31809, 3…
+$ date_dow            &lt;fct&gt; Wed, Thu, Fri, Sat, Sun, Mon, Wed, Thu, Fri, Sat, …
+$ day_type            &lt;fct&gt; weekday, weekday, weekday, weekend, weekend, weekd…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>debug_recipe <span class="ot">&lt;-</span> debug_recipe <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(date_dow)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(debug_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 13
+$ date                &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07, 2018-09-08, 2…
+$ season              &lt;fct&gt; Autumn, Autumn, Autumn, Autumn, Autumn, Autumn, Au…
+$ holiday             &lt;fct&gt; No Holiday, No Holiday, No Holiday, No Holiday, No…
+$ total_rainfall      &lt;dbl&gt; 0.0, 0.0, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.2, …
+$ total_snowfall      &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ avg_temperature     &lt;dbl&gt; 23.837500, 24.250000, 22.158333, 21.691667, 21.958…
+$ avg_humidity        &lt;dbl&gt; 61.79167, 70.79167, 56.87500, 48.66667, 49.45833, …
+$ avg_wind_speed      &lt;dbl&gt; 2.5041667, 1.8958333, 2.4791667, 1.6666667, 1.2333…
+$ avg_visibility      &lt;dbl&gt; 1954.1667, 1635.2500, 1848.7083, 1982.1250, 1997.1…
+$ avg_dew_point_temp  &lt;dbl&gt; 15.4416667, 18.2625000, 12.6458333, 9.8041667, 10.…
+$ avg_solar_radiation &lt;dbl&gt; 0.9358333, 0.4595833, 0.8158333, 0.9479167, 0.8916…
+$ total_bike_count    &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, 30781, 31809, 3…
+$ day_type            &lt;fct&gt; weekday, weekday, weekday, weekend, weekend, weekd…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>debug_recipe <span class="ot">&lt;-</span> debug_recipe <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(season, holiday, day_type) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(debug_recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 15
+$ date                &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07, 2018-09-08, 2…
+$ total_rainfall      &lt;dbl&gt; -0.2970185, -0.2970185, -0.1773679, -0.2970185, -0…
+$ total_snowfall      &lt;dbl&gt; -0.2179228, -0.2179228, -0.2179228, -0.2179228, -0…
+$ avg_temperature     &lt;dbl&gt; 0.942813132, 0.977863864, 0.800131869, 0.760478516…
+$ avg_humidity        &lt;dbl&gt; 0.21420205, 0.81794255, -0.11561916, -0.66625286, …
+$ avg_wind_speed      &lt;dbl&gt; 1.32331031, 0.28870706, 1.28079237, -0.10104074, -…
+$ avg_visibility      &lt;dbl&gt; 1.05187245, 0.41451440, 0.84111295, 1.10774745, 1.…
+$ avg_dew_point_temp  &lt;dbl&gt; 0.87630133, 1.09270791, 0.66181269, 0.44380783, 0.…
+$ avg_solar_radiation &lt;dbl&gt; 1.17578189, -0.32588618, 0.79740883, 1.21388195, 1…
+$ total_bike_count    &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, 30781, 31809, 3…
+$ season_Spring       &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555, -0.5835555, -0…
+$ season_Summer       &lt;dbl&gt; -0.595246, -0.595246, -0.595246, -0.595246, -0.595…
+$ season_Winter       &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555, -0.5835555, -0…
+$ holiday_No.Holiday  &lt;dbl&gt; 0.1984324, 0.1984324, 0.1984324, 0.1984324, 0.1984…
+$ day_type_weekend    &lt;dbl&gt; -0.6362954, -0.6362954, -0.6362954, 1.5656215, 1.5…</code></pre>
+</div>
+</div>
+<p><strong>All together now:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>recipe1 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(total_bike_count <span class="sc">~</span> ., <span class="at">data =</span> train_data) <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_role</span>(date, <span class="at">new_role =</span> <span class="st">"ID"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_date</span>(date, <span class="at">features =</span> <span class="st">"dow"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">day_type =</span> <span class="fu">factor</span>(</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(date_dow <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Sat"</span>, <span class="st">"Sun"</span>), <span class="st">"weekend"</span>, <span class="st">"weekday"</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(date_dow) <span class="sc">|&gt;</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(season, holiday, day_type) <span class="sc">|&gt;</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>recipe1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Recipe ──────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Inputs </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Number of variables by role</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>outcome:    1
+predictor: 10
+ID:         1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Operations </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Date features from: date</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Variable mutation for: factor(if_else(date_dow %in% c("Sat", "Sun"),
+  "weekend", "weekday"))</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Variables removed: date_dow</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Dummy variables from: season, holiday, day_type</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Centering and scaling for: all_numeric() and -all_outcomes()</code></pre>
+</div>
+</div>
+</section>
+<section id="recipe-2" class="level4">
+<h4 class="anchored" data-anchor-id="recipe-2">Recipe 2</h4>
+<p>Unclear to the reason, but <em>starts_with(“season”)</em> did not work. Had to create the interactions manually in spite of the lecture notes in order to avoid the error.</p>
+<p>Also did a google search to address the following <em>warning: prediction from rank-deficient fit; consider predict(., rankdeficient=“NA”)</em>. This lead to the addistion of the step_corr() function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>recipe2 <span class="ot">&lt;-</span> recipe1 <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_interact</span>(<span class="at">terms =</span> <span class="sc">~</span> season_Spring<span class="sc">:</span>holiday_No.Holiday <span class="sc">+</span> </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                          season_Summer<span class="sc">:</span>holiday_No.Holiday <span class="sc">+</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                          season_Winter<span class="sc">:</span>holiday_No.Holiday <span class="sc">+</span> </span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                          season_Spring<span class="sc">:</span>avg_temperature <span class="sc">+</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                          season_Summer<span class="sc">:</span>avg_temperature <span class="sc">+</span> </span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                          season_Winter<span class="sc">:</span>avg_temperature <span class="sc">+</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                          avg_temperature<span class="sc">:</span>total_rainfall)</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(recipe2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 22
+$ date                               &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07…
+$ total_rainfall                     &lt;dbl&gt; -0.2970185, -0.2970185, -0.1773679,…
+$ total_snowfall                     &lt;dbl&gt; -0.2179228, -0.2179228, -0.2179228,…
+$ avg_temperature                    &lt;dbl&gt; 0.942813132, 0.977863864, 0.8001318…
+$ avg_humidity                       &lt;dbl&gt; 0.21420205, 0.81794255, -0.11561916…
+$ avg_wind_speed                     &lt;dbl&gt; 1.32331031, 0.28870706, 1.28079237,…
+$ avg_visibility                     &lt;dbl&gt; 1.05187245, 0.41451440, 0.84111295,…
+$ avg_dew_point_temp                 &lt;dbl&gt; 0.87630133, 1.09270791, 0.66181269,…
+$ avg_solar_radiation                &lt;dbl&gt; 1.17578189, -0.32588618, 0.79740883…
+$ total_bike_count                   &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, …
+$ season_Spring                      &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555,…
+$ season_Summer                      &lt;dbl&gt; -0.595246, -0.595246, -0.595246, -0…
+$ season_Winter                      &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555,…
+$ holiday_No.Holiday                 &lt;dbl&gt; 0.1984324, 0.1984324, 0.1984324, 0.…
+$ day_type_weekend                   &lt;dbl&gt; -0.6362954, -0.6362954, -0.6362954,…
+$ season_Spring_x_holiday_No.Holiday &lt;dbl&gt; -0.1157963, -0.1157963, -0.1157963,…
+$ holiday_No.Holiday_x_season_Summer &lt;dbl&gt; -0.1181161, -0.1181161, -0.1181161,…
+$ holiday_No.Holiday_x_season_Winter &lt;dbl&gt; -0.1157963, -0.1157963, -0.1157963,…
+$ season_Spring_x_avg_temperature    &lt;dbl&gt; -0.550183751, -0.570637797, -0.4669…
+$ season_Summer_x_avg_temperature    &lt;dbl&gt; -0.561205702, -0.582069508, -0.4762…
+$ season_Winter_x_avg_temperature    &lt;dbl&gt; -0.550183751, -0.570637797, -0.4669…
+$ avg_temperature_x_total_rainfall   &lt;dbl&gt; -0.280032902, -0.290443616, -0.1419…</code></pre>
+</div>
+</div>
+</section>
+<section id="recipe-3" class="level4">
+<h4 class="anchored" data-anchor-id="recipe-3">Recipe 3</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>recipe3 <span class="ot">&lt;-</span> recipe2 <span class="sc">|&gt;</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_poly</span>(avg_temperature, total_rainfall, total_snowfall, avg_humidity, </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>            avg_wind_speed, avg_visibility, avg_dew_point_temp, </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>            avg_solar_radiation, <span class="at">degree =</span> <span class="dv">2</span>)</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="fu">show_glimpse</span>(recipe3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 263
+Columns: 30
+$ date                               &lt;date&gt; 2018-09-05, 2018-09-06, 2018-09-07…
+$ total_bike_count                   &lt;dbl&gt; 31114, 27838, 30381, 29813, 28354, …
+$ season_Spring                      &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555,…
+$ season_Summer                      &lt;dbl&gt; -0.595246, -0.595246, -0.595246, -0…
+$ season_Winter                      &lt;dbl&gt; -0.5835555, -0.5835555, -0.5835555,…
+$ holiday_No.Holiday                 &lt;dbl&gt; 0.1984324, 0.1984324, 0.1984324, 0.…
+$ day_type_weekend                   &lt;dbl&gt; -0.6362954, -0.6362954, -0.6362954,…
+$ season_Spring_x_holiday_No.Holiday &lt;dbl&gt; -0.1157963, -0.1157963, -0.1157963,…
+$ holiday_No.Holiday_x_season_Summer &lt;dbl&gt; -0.1181161, -0.1181161, -0.1181161,…
+$ holiday_No.Holiday_x_season_Winter &lt;dbl&gt; -0.1157963, -0.1157963, -0.1157963,…
+$ season_Spring_x_avg_temperature    &lt;dbl&gt; -0.550183751, -0.570637797, -0.4669…
+$ season_Summer_x_avg_temperature    &lt;dbl&gt; -0.561205702, -0.582069508, -0.4762…
+$ season_Winter_x_avg_temperature    &lt;dbl&gt; -0.550183751, -0.570637797, -0.4669…
+$ avg_temperature_x_total_rainfall   &lt;dbl&gt; -0.280032902, -0.290443616, -0.1419…
+$ avg_temperature_poly_1             &lt;dbl&gt; 0.0582471898, 0.0604126312, 0.04943…
+$ avg_temperature_poly_2             &lt;dbl&gt; 4.343638e-03, 8.936806e-03, -1.2777…
+$ total_rainfall_poly_1              &lt;dbl&gt; -0.018349862, -0.018349862, -0.0109…
+$ total_rainfall_poly_2              &lt;dbl&gt; 0.017787545, 0.017787545, -0.002471…
+$ total_snowfall_poly_1              &lt;dbl&gt; -0.01346331, -0.01346331, -0.013463…
+$ total_snowfall_poly_2              &lt;dbl&gt; 0.007912355, 0.007912355, 0.0079123…
+$ avg_humidity_poly_1                &lt;dbl&gt; 0.013233447, 0.050532660, -0.007142…
+$ avg_humidity_poly_2                &lt;dbl&gt; -0.049710700, -0.025703529, -0.0475…
+$ avg_wind_speed_poly_1              &lt;dbl&gt; 0.081754384, 0.017836382, 0.0791276…
+$ avg_wind_speed_poly_2              &lt;dbl&gt; -0.022889314, -0.051814842, -0.0259…
+$ avg_visibility_poly_1              &lt;dbl&gt; 0.064984897, 0.025608785, 0.0519641…
+$ avg_visibility_poly_2              &lt;dbl&gt; 0.052485925, -0.039054487, 0.016026…
+$ avg_dew_point_temp_poly_1          &lt;dbl&gt; 0.054138077, 0.067507720, 0.0408869…
+$ avg_dew_point_temp_poly_2          &lt;dbl&gt; 0.0010118908, 0.0310969311, -0.0230…
+$ avg_solar_radiation_poly_1         &lt;dbl&gt; 0.072640048, -0.020133316, 0.049264…
+$ avg_solar_radiation_poly_2         &lt;dbl&gt; 0.008080770, -0.053656723, -0.03538…</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="set-up-the-linear-model-engine" class="level3">
+<h3 class="anchored" data-anchor-id="set-up-the-linear-model-engine">Set Up the Linear Model Engine</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>) </span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>lm_spec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+</div>
+</div>
+</section>
+<section id="workflows" class="level3">
+<h3 class="anchored" data-anchor-id="workflows">Workflows</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>workflow_and_results <span class="ot">&lt;-</span> <span class="cf">function</span>(recipe) {</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_recipe</span>(recipe) <span class="sc">|&gt;</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(lm_spec)</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>    workflow,</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> cv_folds,</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse)</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  results</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>results1 <span class="ot">&lt;-</span> <span class="fu">workflow_and_results</span>(recipe1)</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>results2 <span class="ot">&lt;-</span> <span class="fu">workflow_and_results</span>(recipe2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>→ A | warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x1
+There were issues with some computations   A: x1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>results3 <span class="ot">&lt;-</span> <span class="fu">workflow_and_results</span>(recipe3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>→ A | warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  results1 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 1"</span>),</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  results2 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 2"</span>),</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  results3 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 3"</span>)</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_results, <span class="fu">aes</span>(<span class="at">x =</span> model, <span class="at">y =</span> mean, <span class="at">group =</span> .metric, <span class="at">color =</span> .metric)) <span class="sc">+</span></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">slice_min</span>(all_results, <span class="at">order_by =</span> mean, <span class="at">n =</span> <span class="dv">1</span>), </span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">stroke =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Model Performance Comparison"</span>, <span class="at">x =</span> <span class="st">"Model"</span>, <span class="at">y =</span> <span class="st">"RMSE"</span>) <span class="sc">+</span></span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW8_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="fit-best-model" class="level2">
+<h2 class="anchored" data-anchor-id="fit-best-model">Fit Best Model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>final_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe3) <span class="sc">|&gt;</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_spec)</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_workflow, <span class="at">split =</span> data_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>test_metrics <span class="ot">&lt;-</span> final_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>test_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric .estimator .estimate .config             
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard    2911.    Preprocessor1_Model1
+2 rsq     standard       0.919 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>final_coefficients <span class="ot">&lt;-</span> final_fit <span class="sc">|&gt;</span> </span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>final_coefficients</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 29 × 5
+   term                               estimate std.error statistic  p.value
+   &lt;chr&gt;                                 &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 (Intercept)                          20261.     1602.    12.6   2.81e-28
+ 2 season_Spring                        -2127.      264.    -8.06  4.00e-14
+ 3 season_Summer                         6316.      973.     6.49  5.07e-10
+ 4 season_Winter                        -4972.     1011.    -4.92  1.65e- 6
+ 5 holiday_No.Holiday                     932.      217.     4.30  2.48e- 5
+ 6 day_type_weekend                     -1106.      180.    -6.14  3.49e- 9
+ 7 season_Spring_x_holiday_No.Holiday     156.      317.     0.494 6.22e- 1
+ 8 holiday_No.Holiday_x_season_Summer    -239.      246.    -0.971 3.33e- 1
+ 9 holiday_No.Holiday_x_season_Winter    -361.      207.    -1.74  8.30e- 2
+10 season_Spring_x_avg_temperature       1924.      492.     3.91  1.21e- 4
+# ℹ 19 more rows</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -24,6 +24,8 @@ set.seed(123)
 
 ## Read Data
 
+The SeoulBikeData.csv contains characters not encoded in UTF-8 (the default encoding in readr). Because of this, we specify the encoding as latin1.
+
 ```{r}
 #| message: false
 
@@ -34,11 +36,15 @@ data <- read_csv("SeoulBikeData.csv", locale=locale(encoding="latin1"))
 
 ### Missing Values
 
+First we check for missing values and luckily there are none to consider
+
 ```{r}
 anyNA(data)
 ```
 
 ### Check Columns
+
+Check the columns and the unique levels of chatagorical variables.
 
 ```{r}
 glimpse(data)
@@ -48,6 +54,8 @@ unique(data$`Functioning Day`)
 ```
 
 ### Convert Date Column
+
+Using lubridate to convert the date column to a date object.
 
 ```{r}
 data$Date <- dmy(data$Date)
@@ -85,6 +93,8 @@ glimpse(data)
 
 ### Summary Statistics
 
+Reusable function for grouped sumary stats
+
 ```{r}
 summary(data)
 
@@ -103,16 +113,17 @@ summarize_bike_rentals <- function(data, group_vars) {
 }
 ```
 
+#### Grouped by Catagorical Variables
 
 ```{r}
 summarize_bike_rentals(data, "season")
 ```
 
-
 ```{r}
 summarize_bike_rentals(data, "holiday")
 ```
 
+Note that the No Functioning Days have no statistics to report
 
 ```{r}
 summarize_bike_rentals(data, "functioning_day")
@@ -125,6 +136,11 @@ functioning_data <- data |> filter(functioning_day == "Yes")
 ```
 
 ###  Summarize Across the Hours
+
+- Summarize across the hours so that each day has one observation associated with it.
+- Group by the date, seasons, and holiday variables.
+- Find the sum of the bike_count, rainfall, and snowfall variables
+- Find the mean of all the weather related variables.
 
 ```{r}
 daily_functioning_data <- functioning_data |>
@@ -141,10 +157,11 @@ daily_functioning_data <- functioning_data |>
     avg_solar_radiation = mean(solar_radiation),
     .groups = "drop"
   )
-daily_functioning_data
+
+summary(daily_functioning_data)
 ```
 
-### Recreate Basic Summary Stats and Correlations
+### Basic Summary Stats and Correlations
 
 ```{r}
 summary(daily_functioning_data$total_bike_count)
@@ -158,6 +175,8 @@ cor_matrix |> knitr::kable()
 ```
 
 ### Visual
+
+Since Average temperature is the most highly correlated with Bike rentals, let's plot it and have a look. 
 
 ```{r}
 ggplot(daily_functioning_data, 
@@ -174,7 +193,7 @@ ggplot(daily_functioning_data,
 
 ## Split Data
 
-*Note: It was mentioned in the lecture that this might be done before our EDA, but here we are following the guidelines set in the assignment.*
+*Note: It was mentioned in the lecture that this might be done before our EDA to avoid the potential of involving our test set. Here we are following the guidelines set in the assignment.*
 
 ```{r}
 data_split <- initial_split(daily_functioning_data, 
@@ -194,9 +213,9 @@ cv_folds
 
 #### Recipe 1
 
-The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful to better understand what is happening.
+The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful in understand how the recipe is being constructed.
 
-The matter at hand was simply errors involving column names. "dow" for instance was created as "date_dow". And the date_dow values were three letter abbreviations for the days.
+The matter at hand was simply errors involving column names. "dow" for instance was created as "date_dow". And the date_dow values were three letter abbreviations for the days. The errors have been identified and removed for this assignement.
 
 ```{r}
 show_glimpse <- function(recipe) {
@@ -298,6 +317,8 @@ lm_spec
 
 ### Workflows
 
+We need to send each recipe through the workflow to get the results.
+
 ```{r}
 workflow_and_results <- function(recipe) {
   workflow <- workflow() |>
@@ -321,9 +342,9 @@ results3 <- workflow_and_results(recipe3)
 
 ```{r}
 all_results <- bind_rows(
-  results1 |> collect_metrics() |> mutate(model = "Model 1"),
-  results2 |> collect_metrics() |> mutate(model = "Model 2"),
-  results3 |> collect_metrics() |> mutate(model = "Model 3")
+  results1 |> collect_metrics() |> mutate(model = "No Interactions"),
+  results2 |> collect_metrics() |> mutate(model = "Interactions"),
+  results3 |> collect_metrics() |> mutate(model = "Interactions + Poly")
 )
 
 ggplot(all_results, aes(x = model, y = mean, group = .metric, color = .metric)) +
@@ -338,6 +359,8 @@ ggplot(all_results, aes(x = model, y = mean, group = .metric, color = .metric)) 
 
 ## Fit Best Model
 
+The model with interactions and polynomial terms had the minimum RMSE amongst the three tested. With this we will fit that model to the entire training data set.
+
 ```{r}
 final_workflow <- workflow() |>
   add_recipe(recipe3) |>
@@ -346,10 +369,14 @@ final_workflow <- workflow() |>
 final_fit <- last_fit(final_workflow, split = data_split)
 ```
 
+Compute the RMSE metric on the test set.
+
 ```{r}
 test_metrics <- final_fit |> collect_metrics()
 test_metrics
 ```
+
+Obtain the final model (fit on the entire training set) coefficient table 
 
 ```{r}
 final_coefficients <- final_fit |> 

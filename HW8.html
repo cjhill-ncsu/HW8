@@ -91,7 +91,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics">Summary Statistics</a></li>
   <li><a href="#subset-on-functioning-days" id="toc-subset-on-functioning-days" class="nav-link" data-scroll-target="#subset-on-functioning-days">Subset on Functioning Days</a></li>
   <li><a href="#summarize-across-the-hours" id="toc-summarize-across-the-hours" class="nav-link" data-scroll-target="#summarize-across-the-hours">Summarize Across the Hours</a></li>
-  <li><a href="#recreate-basic-summary-stats-and-correlations" id="toc-recreate-basic-summary-stats-and-correlations" class="nav-link" data-scroll-target="#recreate-basic-summary-stats-and-correlations">Recreate Basic Summary Stats and Correlations</a></li>
+  <li><a href="#basic-summary-stats-and-correlations" id="toc-basic-summary-stats-and-correlations" class="nav-link" data-scroll-target="#basic-summary-stats-and-correlations">Basic Summary Stats and Correlations</a></li>
   <li><a href="#visual" id="toc-visual" class="nav-link" data-scroll-target="#visual">Visual</a></li>
   </ul></li>
   <li><a href="#split-data" id="toc-split-data" class="nav-link" data-scroll-target="#split-data">Split Data</a></li>
@@ -141,6 +141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="read-data" class="level2">
 <h2 class="anchored" data-anchor-id="read-data">Read Data</h2>
+<p>The SeoulBikeData.csv contains characters not encoded in UTF-8 (the default encoding in readr). Because of this, we specify the encoding as latin1.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"SeoulBikeData.csv"</span>, <span class="at">locale=</span><span class="fu">locale</span>(<span class="at">encoding=</span><span class="st">"latin1"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -149,6 +150,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="eda">EDA</h2>
 <section id="missing-values" class="level3">
 <h3 class="anchored" data-anchor-id="missing-values">Missing Values</h3>
+<p>First we check for missing values and luckily there are none to consider</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anyNA</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -158,6 +160,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="check-columns" class="level3">
 <h3 class="anchored" data-anchor-id="check-columns">Check Columns</h3>
+<p>Check the columns and the unique levels of chatagorical variables.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -194,6 +197,7 @@ $ `Functioning Day`           &lt;chr&gt; "Yes", "Yes", "Yes", "Yes", "Yes", "Ye
 </section>
 <section id="convert-date-column" class="level3">
 <h3 class="anchored" data-anchor-id="convert-date-column">Convert Date Column</h3>
+<p>Using lubridate to convert the date column to a date object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">dmy</span>(data<span class="sc">$</span>Date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -248,6 +252,7 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </section>
 <section id="summary-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
+<p>Reusable function for grouped sumary stats</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -294,6 +299,8 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<section id="grouped-by-catagorical-variables" class="level4">
+<h4 class="anchored" data-anchor-id="grouped-by-catagorical-variables">Grouped by Catagorical Variables</h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_bike_rentals</span>(data, <span class="st">"season"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -396,6 +403,7 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </table>
 </div>
 </div>
+<p>Note that the No Functioning Days have no statistics to report</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_bike_rentals</span>(data, <span class="st">"functioning_day"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -440,6 +448,7 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </div>
 </div>
 </section>
+</section>
 <section id="subset-on-functioning-days" class="level3">
 <h3 class="anchored" data-anchor-id="subset-on-functioning-days">Subset on Functioning Days</h3>
 <div class="cell">
@@ -448,6 +457,12 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </section>
 <section id="summarize-across-the-hours" class="level3">
 <h3 class="anchored" data-anchor-id="summarize-across-the-hours">Summarize Across the Hours</h3>
+<ul>
+<li>Summarize across the hours so that each day has one observation associated with it.</li>
+<li>Group by the date, seasons, and holiday variables.</li>
+<li>Find the sum of the bike_count, rainfall, and snowfall variables</li>
+<li>Find the mean of all the weather related variables.</li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>daily_functioning_data <span class="ot">&lt;-</span> functioning_data <span class="sc">|&gt;</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date, season, holiday) <span class="sc">|&gt;</span></span>
@@ -463,30 +478,35 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 <span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_solar_radiation =</span> <span class="fu">mean</span>(solar_radiation),</span>
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>daily_functioning_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(daily_functioning_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 353 × 12
-   date       season holiday    total_bike_count total_rainfall total_snowfall
-   &lt;date&gt;     &lt;fct&gt;  &lt;fct&gt;                 &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
- 1 2017-12-01 Winter No Holiday             9539            0              0  
- 2 2017-12-02 Winter No Holiday             8523            0              0  
- 3 2017-12-03 Winter No Holiday             7222            4              0  
- 4 2017-12-04 Winter No Holiday             8729            0.1            0  
- 5 2017-12-05 Winter No Holiday             8307            0              0  
- 6 2017-12-06 Winter No Holiday             6669            1.3            8.6
- 7 2017-12-07 Winter No Holiday             8549            0             10.4
- 8 2017-12-08 Winter No Holiday             8032            0              0  
- 9 2017-12-09 Winter No Holiday             7233            0              0  
-10 2017-12-10 Winter No Holiday             3453            4.1           32.5
-# ℹ 343 more rows
-# ℹ 6 more variables: avg_temperature &lt;dbl&gt;, avg_humidity &lt;dbl&gt;,
-#   avg_wind_speed &lt;dbl&gt;, avg_visibility &lt;dbl&gt;, avg_dew_point_temp &lt;dbl&gt;,
-#   avg_solar_radiation &lt;dbl&gt;</code></pre>
+<pre><code>      date               season         holiday    total_bike_count
+ Min.   :2017-12-01   Autumn:81   Holiday   : 17   Min.   :  977   
+ 1st Qu.:2018-02-27   Spring:90   No Holiday:336   1st Qu.: 6967   
+ Median :2018-05-28   Summer:92                    Median :18563   
+ Mean   :2018-05-28   Winter:90                    Mean   :17485   
+ 3rd Qu.:2018-08-24                                3rd Qu.:26285   
+ Max.   :2018-11-30                                Max.   :36149   
+ total_rainfall   total_snowfall   avg_temperature    avg_humidity  
+ Min.   : 0.000   Min.   : 0.000   Min.   :-14.738   Min.   :22.25  
+ 1st Qu.: 0.000   1st Qu.: 0.000   1st Qu.:  3.304   1st Qu.:47.58  
+ Median : 0.000   Median : 0.000   Median : 13.738   Median :57.17  
+ Mean   : 3.576   Mean   : 1.863   Mean   : 12.776   Mean   :58.17  
+ 3rd Qu.: 0.500   3rd Qu.: 0.000   3rd Qu.: 22.592   3rd Qu.:67.71  
+ Max.   :95.500   Max.   :78.700   Max.   : 33.742   Max.   :95.88  
+ avg_wind_speed   avg_visibility   avg_dew_point_temp avg_solar_radiation
+ Min.   :0.6625   Min.   : 214.3   Min.   :-27.750    Min.   :0.02917    
+ 1st Qu.:1.3042   1st Qu.:1087.0   1st Qu.: -5.188    1st Qu.:0.28333    
+ Median :1.6583   Median :1557.8   Median :  4.612    Median :0.56500    
+ Mean   :1.7261   Mean   :1434.0   Mean   :  3.954    Mean   :0.56773    
+ 3rd Qu.:1.9542   3rd Qu.:1874.3   3rd Qu.: 14.921    3rd Qu.:0.82000    
+ Max.   :4.0000   Max.   :2000.0   Max.   : 25.038    Max.   :1.21667    </code></pre>
 </div>
 </div>
 </section>
-<section id="recreate-basic-summary-stats-and-correlations" class="level3">
-<h3 class="anchored" data-anchor-id="recreate-basic-summary-stats-and-correlations">Recreate Basic Summary Stats and Correlations</h3>
+<section id="basic-summary-stats-and-correlations" class="level3">
+<h3 class="anchored" data-anchor-id="basic-summary-stats-and-correlations">Basic Summary Stats and Correlations</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(daily_functioning_data<span class="sc">$</span>total_bike_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -642,6 +662,7 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </section>
 <section id="visual" class="level3">
 <h3 class="anchored" data-anchor-id="visual">Visual</h3>
+<p>Since Average temperature is the most highly correlated with Bike rentals, let’s plot it and have a look.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(daily_functioning_data, </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> avg_temperature, </span>
@@ -665,7 +686,7 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 </section>
 <section id="split-data" class="level2">
 <h2 class="anchored" data-anchor-id="split-data">Split Data</h2>
-<p><em>Note: It was mentioned in the lecture that this might be done before our EDA, but here we are following the guidelines set in the assignment.</em></p>
+<p><em>Note: It was mentioned in the lecture that this might be done before our EDA to avoid the potential of involving our test set. Here we are following the guidelines set in the assignment.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>data_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(daily_functioning_data, </span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">prop =</span> <span class="fl">0.75</span>, </span>
@@ -700,8 +721,8 @@ $ functioning_day   &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes, Yes
 <h3 class="anchored" data-anchor-id="recipes-preprocessing">Recipes (preprocessing)</h3>
 <section id="recipe-1" class="level4">
 <h4 class="anchored" data-anchor-id="recipe-1">Recipe 1</h4>
-<p>The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful to better understand what is happening.</p>
-<p>The matter at hand was simply errors involving column names. “dow” for instance was created as “date_dow”. And the date_dow values were three letter abbreviations for the days.</p>
+<p>The addition of the weekday/weekend factor in the recipe is causing considerable trouble. Here we will go step by step to show my steps to address the issue. I found this very helpful in understand how the recipe is being constructed.</p>
+<p>The matter at hand was simply errors involving column names. “dow” for instance was created as “date_dow”. And the date_dow values were three letter abbreviations for the days. The errors have been identified and removed for this assignement.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>show_glimpse <span class="ot">&lt;-</span> <span class="cf">function</span>(recipe) {</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  recipe <span class="sc">|&gt;</span> </span>
@@ -974,6 +995,7 @@ Computational engine: lm </code></pre>
 </section>
 <section id="workflows" class="level3">
 <h3 class="anchored" data-anchor-id="workflows">Workflows</h3>
+<p>We need to send each recipe through the workflow to get the results.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>workflow_and_results <span class="ot">&lt;-</span> <span class="cf">function</span>(recipe) {</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
@@ -1008,9 +1030,9 @@ There were issues with some computations   A: x1</code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  results1 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 1"</span>),</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  results2 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 2"</span>),</span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  results3 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Model 3"</span>)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  results1 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"No Interactions"</span>),</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  results2 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Interactions"</span>),</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  results3 <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Interactions + Poly"</span>)</span>
 <span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(all_results, <span class="fu">aes</span>(<span class="at">x =</span> model, <span class="at">y =</span> mean, <span class="at">group =</span> .metric, <span class="at">color =</span> .metric)) <span class="sc">+</span></span>
@@ -1033,6 +1055,7 @@ There were issues with some computations   A: x1</code></pre>
 </section>
 <section id="fit-best-model" class="level2">
 <h2 class="anchored" data-anchor-id="fit-best-model">Fit Best Model</h2>
+<p>The model with interactions and polynomial terms had the minimum RMSE amongst the three tested. With this we will fit that model to the entire training data set.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>final_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe3) <span class="sc">|&gt;</span></span>
@@ -1040,6 +1063,7 @@ There were issues with some computations   A: x1</code></pre>
 <span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_workflow, <span class="at">split =</span> data_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Compute the RMSE metric on the test set.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>test_metrics <span class="ot">&lt;-</span> final_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span>
 <span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>test_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1051,6 +1075,7 @@ There were issues with some computations   A: x1</code></pre>
 2 rsq     standard       0.919 Preprocessor1_Model1</code></pre>
 </div>
 </div>
+<p>Obtain the final model (fit on the entire training set) coefficient table</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>final_coefficients <span class="ot">&lt;-</span> final_fit <span class="sc">|&gt;</span> </span>
 <span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">|&gt;</span> </span>
